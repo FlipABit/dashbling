@@ -32,6 +32,7 @@ jobs:
         echo "${{ toJson(github.event.pull_request.labels) }}"
         echo "${{ toJson(github.event.pull_request.labels.*.name) }}"
         echo "${{ github.event.pull_request.merged }}"
+        echo "${{ steps.version-label.outputs.level }}"
       
     #- name: NPM Version #test
     #  if: ${{ steps.version-label.outputs.level != null }}
