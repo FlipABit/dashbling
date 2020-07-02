@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Enforce Version Label
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -11,19 +11,27 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  release:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it. test
-    - uses: actions/checkout@v2
-  enforce-label:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: yogevbd/enforce-label-action@2.1.0
-      with:
-        REQUIRED_LABELS_ANY: "version-major,version-minor,version-patch"
-        REQUIRED_LABELS_ANY_DESCRIPTION: "Select at least one label ['version-major','version-minor','version-patch']"
+      - name: Actions Ecosystem Action Release Label
+        uses: actions-ecosystem/action-release-label@v1.2.0
+        id: release-label
+        with:
+          # A prefix for labels that indicate semver level ({major, minor, patch}).
+          label_prefix: version-
+        
+      - name: Enforce release label
+        id: enforce-pr-label
+        run: exit 1
+        if: ${{ steps.release-label.outputs.level != null }}
+
+  #enforce-label:
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - uses: yogevbd/enforce-label-action@2.1.0
+  #    with:
+  #      REQUIRED_LABELS_ANY: "version-major,version-minor,version-patch"
+  #      REQUIRED_LABELS_ANY_DESCRIPTION: "Select at least one label ['version-major','version-minor','version-patch']"
