@@ -26,7 +26,7 @@ jobs:
       - name: Enforce release label
         id: enforce-pr-label
         run: exit 1
-        if: ${{ steps.release-label.outputs.level != null }}
+        if: ${{ steps.release-label.outputs.level == null }}
 
   #enforce-label:
   #  runs-on: ubuntu-latest
