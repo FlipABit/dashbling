@@ -37,5 +37,5 @@ jobs:
     #  if: ${{ steps.version-label.outputs.level != null }}
     #  
     #  run: |
-    #    echo "::error PR's to master with a 'version-*' label require a 'release' label"
+    #    echo "::error PR's to master with a 'version-*' label require a 'release' label"##
     #    exit 1
