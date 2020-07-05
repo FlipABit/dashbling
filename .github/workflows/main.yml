@@ -53,7 +53,7 @@ jobs:
     - name: Bump NPM version and push
       id: bump-and-push
       run: |
-        npm version "${{ steps.version-label.outputs.level }}" -m "Bump version to %s" --force
+        npm version ${{ steps.version-label.outputs.level }} -m "Bump version to %s" --force --verbose
         git remote add gh-origin https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
         git push gh-origin HEAD:master --tags
       if: ${{ github.event.pull_request.merged && steps.version-label.outputs.level != null }}
