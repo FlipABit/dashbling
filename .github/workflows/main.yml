@@ -19,6 +19,15 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     steps:
+    
+    - uses: actions/checkout@v1
+      if: github.event.pull_request.merged
+      with:
+        ref: refs/heads/master
+      
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
 
     - name: Get Version Label
       uses: actions-ecosystem/action-release-label@v1.2.0
@@ -26,6 +35,30 @@ jobs:
       with:
         # A prefix for labels that indicate semver level ({major, minor, patch}).#
         label_prefix: version-
+    
+    #- run: npm ci
+    #  if: ${{ steps.version-label.outputs.level != null }}
+  
+    #- run: npm build
+    #  if: ${{ steps.version-label.outputs.level != null }}
+    
+    #- run: npm build:sproc
+    #  if: ${{ steps.version-label.outputs.level != null }}
+
+    - name: Configure Git
+      run: |
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+    
+    - name: Bump NPM version and push
+      id: bump-and-push
+      run: |
+        npm version ${{ steps.version-label.outputs.level }} -m "Bump version to %s" --force
+        git remote add gh-origin https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        git push gh-origin HEAD:master --tags
+      if: ${{ github.event.pull_request.merged && steps.version-label.outputs.level != null }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Debug Release Label
       run: |
@@ -33,7 +66,8 @@ jobs:
         echo "${{ toJson(github.event.pull_request.labels.*.name) }}"
         echo "${{ github.event.pull_request.merged }}"
         echo "${{ steps.version-label.outputs.level }}"
-      
+    
+   
     #- name: NPM Version #test
     #  if: ${{ steps.version-label.outputs.level != null }}
     #  
